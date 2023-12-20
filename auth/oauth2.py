@@ -4,13 +4,14 @@ from typing import Optional
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
+from config import Settings
 from database import db_user
 
 from database.database import get_db
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-SECRET_KEY = 'uwusecretkey'
+SECRET_KEY = Settings().SECRET_KEY
 ALGORITHM = 'HS256'
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
