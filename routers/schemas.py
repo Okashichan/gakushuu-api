@@ -1,6 +1,7 @@
 from typing import List, Optional
 from pydantic import BaseModel
 from datetime import datetime
+from config import get_settings
 
 
 class Role(BaseModel):
@@ -71,7 +72,7 @@ class UserBase(BaseModel):
     username: str
     password_hash: str
     email: str
-    avatar: str = 'http://127.0.0.1:8000/static/blank_avatar.jpg'
+    avatar: str = f'{get_settings().APP_URL}/static/images/blank_avatar.jpg'
     created_at: datetime
     role_id: int
 

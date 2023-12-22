@@ -1,11 +1,9 @@
-from functools import lru_cache
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from database import models
 from database.database import engine
 from auth import authentication
 from routers import role, user, dictionary
-from config import Settings
 
 
 app = FastAPI()
@@ -18,11 +16,6 @@ app.include_router(dictionary.router)
 @app.get("/hello")
 def index():
     return {"message": "Hello, World!"}
-
-
-@lru_cache
-def get_settings():
-    return Settings()
 
 
 models.Base.metadata.create_all(engine)

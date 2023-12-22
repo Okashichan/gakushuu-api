@@ -68,3 +68,18 @@ def get_user_by_username(db: Session, username: str):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"User with username {username} not found")
     return user
+
+
+def update_avatar_by_id(db: Session, avatar: str, user_id: int):
+    user = db.query(DbUser).filter(DbUser.id == user_id).first()
+
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"User with id {user_id} not found")
+
+    user.avatar = avatar
+
+    db.commit()
+    db.refresh(user)
+
+    return {"message": f"User with id {user_id} updated"}
