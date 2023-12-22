@@ -27,4 +27,4 @@ def get_token(request: OAuth2PasswordRequestForm = Depends(), db: Session = Depe
 
     access_token = oauth2.create_access_token(data={"sub": user.username})
 
-    return {"access_token": access_token, "token_type": "bearer", "user_id": user.id, "username": user.username}
+    return {"access_token": access_token, "token_type": "bearer", "user_id": user.id, "username": user.username, "avatar": user.avatar}
