@@ -61,11 +61,12 @@ def delete(db: Session, dictionary_id: int):
 
 def get_entry_by_original_name(db: Session, original: str):
     word = db.query(DbDictionary).filter(
-        DbDictionary.original == original).first()
+        DbDictionary.original == original).all()
 
     if not word:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Word with original name {original} not found")
+        return None
+        # raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+        #                     detail=f"Word with original name {original} not found")
 
     return word
 
