@@ -1,14 +1,22 @@
 import shutil
-import string
-from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
-from sqlalchemy.orm.session import Session
-from auth.oauth2 import get_current_user
-from config import get_settings
-
-from database.database import get_db
-from database import db_user
-from routers.schemas import UserBase, UserDisplay
 import uuid
+from config import settings
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
+# from sqlalchemy.orm.session import Session
+from auth.oauth2 import get_current_user
+# from config import get_settings
+
+# from database.database import get_db
+# from database import db_user
+
+from pymongo import errors
+from schemas.user import (UserBase as UserBaseSchema,
+                          UserUpdate as UserUpdateSchema,
+                          UserPrivate as UserPrivateSchema,
+                          UserPublic as UserPublicSchema)
+from models.user import User as UserModel
+from database.hash import Hash
+from beanie.exceptions import RevisionIdWasChanged
 
 router = APIRouter(
     prefix="/user",
@@ -16,28 +24,76 @@ router = APIRouter(
 )
 
 
-@router.post("/")
-def create(request: UserBase, db: Session = Depends(get_db)):
-    return db_user.create(db, request)
+@router.post("/", response_model=UserBaseSchema, status_code=status.HTTP_201_CREATED)
+async def create(request: UserBaseSchema):
+
+    user = UserModel(
+        username=request.username,
+        password=Hash.bcrypt(request.password),
+        avatar_url=request.avatar_url,
+        email=request.email
+    )
+
+    try:
+        await user.create()
+        return user
+    except errors.DuplicateKeyError:
+        raise HTTPException(
+            status_code=400, detail="User with that email already exists."
+        )
 
 
-@router.put("/{user_id}")
-def update(user_id: int, request: UserBase, db: Session = Depends(get_db), current_user: UserBase = Depends(get_current_user)):
-    return db_user.update(db, request, user_id)
+@router.get("/me", response_model=UserPrivateSchema)
+async def read_me(current_user: UserPrivateSchema = Depends(get_current_user)):
+    return current_user
 
 
-@router.delete("/{user_id}")
-def delete(user_id: int, db: Session = Depends(get_db), current_user: UserBase = Depends(get_current_user)):
-    return db_user.delete(db, user_id)
+@router.patch("/me", response_model=UserBaseSchema)
+async def update(update: UserUpdateSchema, current_user: UserModel = Depends(get_current_user)):
+
+    update_data = update.model_dump(exclude_unset=True)
+
+    current_user = current_user.model_copy(update=update_data)
+
+    try:
+        await current_user.save()
+        return current_user
+    except (errors.DuplicateKeyError, RevisionIdWasChanged):
+        raise HTTPException(
+            status_code=400, detail="User with that email already exists."
+        )
 
 
-@router.get("/{user_id}", response_model=UserDisplay)
-def get_user(user_id: int, db: Session = Depends(get_db), current_user: UserBase = Depends(get_current_user)):
-    return db_user.get_user(db, user_id)
+@router.delete("/me", response_model=UserPrivateSchema)
+async def delete(current_user: UserModel = Depends(get_current_user)):
+    await current_user.delete()
+    return current_user
+
+    # update_user = UserModel(**update.model_dump(exclude_unset=True))
+
+    # if update_user:
+    #     current_user = current_user.model_copy(update=update_user)
+    #     try:
+    #         await current_user.save()
+    #         return current_user
+    #     except (errors.DuplicateKeyError, RevisionIdWasChanged):
+    #         raise HTTPException(
+    #             status_code=400, detail="User with that email already exists."
+    #         )
 
 
-@router.post("/upload_avatar")
-def upload_avatar(image: UploadFile = File(...), db: Session = Depends(get_db), current_user: UserBase = Depends(get_current_user)):
+# @router.delete("/{user_id}")
+# def delete(user_id: int, db: Session = Depends(get_db), current_user: UserBase = Depends(get_current_user)):
+#     return db_user.delete(db, user_id)
+
+
+@router.get("/{username}", response_model=UserPublicSchema)
+async def get_user(username: str):
+    return await UserModel.find_one({"username": username})
+
+
+@router.post("/upload_avatar", response_model=UserPrivateSchema)
+async def upload_avatar(image: UploadFile = File(...), current_user: UserModel = Depends(get_current_user)):
     new_avatar = f'{uuid.uuid4()}.'
     filename = new_avatar.join(image.filename.rsplit('.', 1))
     path = f'static/images/{filename}'
@@ -45,8 +101,10 @@ def upload_avatar(image: UploadFile = File(...), db: Session = Depends(get_db), 
     with open(path, 'w+b') as buffer:
         shutil.copyfileobj(image.file, buffer)
 
-    url = f'{get_settings().APP_URL}/{path}'
+    avatar_url = f'{settings.APP_URL}/{path}'
 
-    db_user.update_avatar_by_id(db, url, current_user.id)
+    current_user.avatar_url = avatar_url
 
-    return {"avatar_url": url}
+    await current_user.save()
+
+    return current_user
