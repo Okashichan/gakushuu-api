@@ -5,7 +5,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from routers import user, role
+from routers import (user,
+                     role,
+                     dictionary)
 
 from models.role import Role
 from models.user import User
@@ -64,7 +66,7 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(authentication.router)
 app.include_router(role.router)
 app.include_router(user.router)
-# app.include_router(dictionary.router)
+app.include_router(dictionary.router)
 
 
 @app.get("/hello")
