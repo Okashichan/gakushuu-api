@@ -11,7 +11,7 @@ from models.role import Role
 class User(Document):
     uuid: UUID = Field(default_factory=uuid4)
     email: Annotated[EmailStr, Indexed(unique=True)] = None
-    username: str = None
+    username: Annotated[str, Indexed(unique=True)] = None
     password: str = None
     role: Link[Role] = None
 

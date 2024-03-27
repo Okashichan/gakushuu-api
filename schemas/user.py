@@ -14,7 +14,8 @@ class UserBase(BaseModel):
     email: str
     username: str
     password: str
-    avatar_url: Optional[str] = f'{settings.APP_URL}/static/images/blank_avatar.jpg'
+    avatar_url: Optional[str] = Field(
+        default=f'{settings.APP_URL}/static/images/blank_avatar.jpg')
 
 
 class UserPublic(BaseModel):
@@ -44,7 +45,7 @@ class UserPrivate(BaseModel):
     id: PydanticObjectId
     uuid: UUID
     role: RoleBase
-    email: EmailStr
+    email: str
     username: str
     avatar_url: str
     created_at: datetime

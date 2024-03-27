@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field
 from uuid import UUID
 
@@ -14,8 +13,8 @@ class RoleBase(BaseModel):
     """
     Shared Role properties.
     """
-    uuid: Optional[UUID]
-    name: Optional[str]
+    uuid: UUID
+    name: str
 
 
 class RoleUpdate(BaseModel):
