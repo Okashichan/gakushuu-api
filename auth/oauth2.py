@@ -1,14 +1,12 @@
-from uuid import UUID
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from typing import Optional
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
-from pydantic import ValidationError
 from config import settings
-# from database import db_user
 
 from models.user import User
+from schemas.user import UserPrivate
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -42,9 +40,27 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     except JWTError:
         raise credentials_exception
 
-    user = await User.find_one({"username": username})
+    user = await User.find_one(User.username == username, fetch_links=True)
 
     if user is None:
         raise credentials_exception
 
     return user
+
+
+async def admin_check(current_user: UserPrivate = Depends(get_current_user)):
+    if current_user.role.name != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have admin permissions to perform this action."
+        )
+    return True
+
+
+async def linguist_check(current_user: UserPrivate = Depends(get_current_user)):
+    if current_user.role.name != "linguist":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have linguist permissions to perform this action."
+        )
+    return True

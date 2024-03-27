@@ -1,10 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
-from sqlalchemy.orm.session import Session
-from auth.oauth2 import get_current_user
+from uuid import UUID
+from fastapi import APIRouter, Depends
+from auth.oauth2 import get_current_user, admin_check
 
-from database.database import get_db
-from database import db_role
-from routers.schemas import RoleBase, UserBase
+from models.role import Role
+from schemas.role import RoleUpdate
+from schemas.user import UserPrivate
+
+from models.user import User
+
 
 router = APIRouter(
     prefix="/role",
@@ -12,16 +15,12 @@ router = APIRouter(
 )
 
 
-@router.post("/")
-def create(request: RoleBase, db: Session = Depends(get_db), current_user: UserBase = Depends(get_current_user)):
-    return db_role.create(db, request)
+@router.patch("/{uuid}", response_model=UserPrivate)
+async def update(uuid: UUID, request: RoleUpdate, current_user: UserPrivate = Depends(get_current_user), is_admin: bool = Depends(admin_check)):
+    update_data = await User.find_one(User.uuid == uuid, fetch_links=True)
 
+    update_data.role = await Role.find_one(Role.name == request.name)
 
-@router.put("/{role_id}")
-def update(role_id: int, request: RoleBase, db: Session = Depends(get_db), current_user: UserBase = Depends(get_current_user)):
-    return db_role.update(db, request, role_id)
+    await update_data.save()
 
-
-@router.delete("/{role_id}")
-def delete(role_id: int, db: Session = Depends(get_db), current_user: UserBase = Depends(get_current_user)):
-    return db_role.delete(db, role_id)
+    return update_data

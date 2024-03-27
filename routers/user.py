@@ -10,6 +10,7 @@ from auth.oauth2 import get_current_user
 # from database import db_user
 
 from pymongo import errors
+from models.role import Role
 from schemas.user import (UserBase as UserBaseSchema,
                           UserUpdate as UserUpdateSchema,
                           UserPrivate as UserPrivateSchema,
@@ -31,7 +32,8 @@ async def create(request: UserBaseSchema):
         username=request.username,
         password=Hash.bcrypt(request.password),
         avatar_url=request.avatar_url,
-        email=request.email
+        email=request.email,
+        role=await Role.find_one(Role.name == "user")
     )
 
     try:
