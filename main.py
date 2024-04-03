@@ -11,6 +11,8 @@ from routers import (user,
 
 from models.role import Role
 from models.user import User
+from models.dictionary import Dictionary
+
 from database.hash import Hash
 
 from beanie import init_beanie
@@ -27,7 +29,7 @@ async def lifespan(app: FastAPI):
         username=settings.MONGO_USER,
         password=settings.MONGO_PASSWORD,
     )
-    await init_beanie(database=app.client[settings.MONGO_DB], document_models=[User, Role])
+    await init_beanie(database=app.client[settings.MONGO_DB], document_models=[User, Role, Dictionary])
 
     role_admin = await Role.find_one({"name": "admin"})
     role_linguist = await Role.find_one({"name": "linguist"})
