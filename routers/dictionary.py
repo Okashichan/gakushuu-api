@@ -1,6 +1,7 @@
 from typing import List
 from uuid import UUID
 from beanie import PydanticObjectId
+from beanie.odm.operators.find.logical import Or
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 import pykakasi
 from jamdict import Jamdict
@@ -165,7 +166,9 @@ async def get_all_entries():
 @router.get("/search/{query}", response_model=DictionaryMassSearch)
 async def search(query: str):
 
-    dic = await Dictionary.find_many(Dictionary.kanji == query).to_list()
+    dic = await Dictionary.find_many(Or(Dictionary.kanji == query,
+                                     Dictionary.hiragana == query,
+                                     Dictionary.ua_translation == query)).to_list()
     dic_base_list = [DictionaryBase(**d.model_dump()) for d in dic]
     local = get_kanji_info(query)
 
