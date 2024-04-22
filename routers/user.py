@@ -23,10 +23,12 @@ router = APIRouter(
 
 @router.post("/", response_model=UserBaseSchema, status_code=status.HTTP_201_CREATED)
 async def create(request: UserBaseSchema):
+
+    print(request.model_dump_json())
+
     user = UserModel(
         username=request.username,
         password=Hash.bcrypt(request.password),
-        avatar_url=request.avatar_url,
         email=request.email,
         role=await Role.find_one(Role.name == "user")
     )
@@ -68,7 +70,7 @@ async def delete(current_user: UserModel = Depends(get_current_user)):
 
 @router.get("/{username}", response_model=UserPublicSchema)
 async def get_user(username: str):
-    return await UserModel.find_one({"username": username})
+    return await UserModel.find_one({"username": username}, fetch_links=True)
 
 
 @router.post("/upload_avatar", response_model=UserPrivateSchema)

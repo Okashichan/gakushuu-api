@@ -111,6 +111,8 @@ async def create_entry(request: DictionaryBase, current_user: User = Depends(get
         created_by=current_user.id
     )
 
+    print(dictionary.model_dump_json())
+
     try:
         await dictionary.save()
         return dictionary
@@ -174,6 +176,8 @@ async def search(query: str):
 
     results = DictionaryMassSearch(en_sourse=local, ua_sourse=dic_base_list)
 
+    # print(results.model_dump_json())
+
     return results
 
 
@@ -182,6 +186,4 @@ def get_jamdict(idseq: int):
 
     result = get_kanji_info(idseq)[0]
 
-    return {
-        "en_source": result
-    }
+    return result

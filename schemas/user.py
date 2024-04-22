@@ -4,7 +4,7 @@ from beanie import PydanticObjectId
 from pydantic import BaseModel, EmailStr, Field
 from uuid import UUID
 from config import settings
-from schemas.role import RoleBase
+from schemas.role import RoleBase, RoleUpdate
 
 
 class UserBase(BaseModel):
@@ -25,6 +25,7 @@ class UserPublic(BaseModel):
     email: EmailStr
     username: str
     avatar_url: str
+    role: RoleUpdate
     created_at: datetime
 
 
