@@ -9,7 +9,7 @@ class DictionaryBase(BaseModel):
     idseq: Optional[int]
     kanji: str
     hiragana: str
-    katakana: str
+    katakana: Optional[str]
     romaji: str
     transliteration: str
     kunyomi: str

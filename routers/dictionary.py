@@ -97,6 +97,9 @@ def hiragana_to_ukrainian(hira):
 
 @router.post("/")
 async def create_entry(request: DictionaryBase, current_user: User = Depends(get_current_user)):
+
+    print(request.model_dump_json())
+
     dictionary = Dictionary(
         idseq=request.idseq,
         kanji=request.kanji,
@@ -176,7 +179,7 @@ async def search(query: str):
 
     results = DictionaryMassSearch(en_sourse=local, ua_sourse=dic_base_list)
 
-    # print(results.model_dump_json())
+    print(results.model_dump_json())
 
     return results
 
