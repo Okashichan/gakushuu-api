@@ -51,6 +51,9 @@ async def read_me(current_user: UserPrivateSchema = Depends(get_current_user)):
 async def update(update: UserUpdateSchema, current_user: UserModel = Depends(get_current_user)):
     update_data = update.model_dump(exclude_unset=True)
 
+    if "password" in update_data:
+        update_data["password"] = Hash.bcrypt(update_data["password"])
+
     current_user = current_user.model_copy(update=update_data)
 
     try:
