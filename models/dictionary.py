@@ -9,6 +9,7 @@ from models.user import User
 
 
 class Dictionary(Document):
+    uuid: UUID = Field(default_factory=uuid4)
     idseq: Optional[Annotated[int, Indexed(unique=True)]] = None
     kanji: str = None
     hiragana: str = None

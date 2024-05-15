@@ -6,6 +6,7 @@ from uuid import UUID
 
 
 class DictionaryBase(BaseModel):
+    uuid: UUID
     idseq: Optional[int]
     kanji: str
     hiragana: str
@@ -16,6 +17,9 @@ class DictionaryBase(BaseModel):
     onyomi: str
     en_translation: str
     ua_translation: Optional[str]
+    approved: bool
+    updated_at: datetime
+    approved_by: Optional[UUID]
 
 
 class DictionaryMassSearch(BaseModel):
