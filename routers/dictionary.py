@@ -34,7 +34,7 @@ def get_kanji_info(query: str | int):
 
     for index, entry in enumerate(kanji_info.entries):
         hiragana = entry.kana_forms[0].text
-        # print(entry.senses[0])
+        print(entry)
         results.append({
             "idseq": entry.idseq,
             "kanji": entry.kanji_forms[0].text if len(entry.kanji_forms) > 0 else None,
@@ -42,8 +42,8 @@ def get_kanji_info(query: str | int):
             "katakana": entry.kana_forms[1].text if len(entry.kana_forms) > 1 else None,
             "romaji": kks.convert(hiragana)[0]['hepburn'],
             "transliteration": hiragana_to_ukrainian(hiragana),
-            "kunyomi": kanji_info.chars[0].rm_groups[0].kun_readings[0].value,
-            "onyomi": kanji_info.chars[0].rm_groups[0].on_readings[0].value,
+            "kunyomi": kanji_info.chars[0].rm_groups[0].kun_readings[0].value if len(kanji_info.chars) > 0 else None,
+            "onyomi": kanji_info.chars[0].rm_groups[0].on_readings[0].value if len(kanji_info.chars) > 0 else None,
             "en_translation": entry.senses[0].gloss[0].text,
             "ua_translation": None,
         })
