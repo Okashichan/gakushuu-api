@@ -34,9 +34,10 @@ def get_kanji_info(query: str | int):
 
     for index, entry in enumerate(kanji_info.entries):
         hiragana = entry.kana_forms[0].text
+        # print(entry.senses[0])
         results.append({
             "idseq": entry.idseq,
-            "kanji": entry.kanji_forms[0].text if len(entry.kanji_forms) > 1 else None,
+            "kanji": entry.kanji_forms[0].text if len(entry.kanji_forms) > 0 else None,
             "hiragana": hiragana,
             "katakana": entry.kana_forms[1].text if len(entry.kana_forms) > 1 else None,
             "romaji": kks.convert(hiragana)[0]['hepburn'],
