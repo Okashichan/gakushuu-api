@@ -7,7 +7,8 @@ import pykakasi
 from jamdict import Jamdict
 from auth.oauth2 import get_current_user
 
-from schemas.dictionary import (DictionaryBase, DictionaryMassSearch)
+from schemas.dictionary import (
+    DictionaryBase, DictionaryMassSearch, DictionaryCreate)
 from models.user import User
 from models.dictionary import Dictionary
 
@@ -96,7 +97,7 @@ def hiragana_to_ukrainian(hira):
 
 
 @router.post("/")
-async def create_entry(request: DictionaryBase, current_user: User = Depends(get_current_user)):
+async def create_entry(request: DictionaryCreate, current_user: User = Depends(get_current_user)):
 
     print(request.model_dump_json())
 
@@ -111,7 +112,9 @@ async def create_entry(request: DictionaryBase, current_user: User = Depends(get
         onyomi=request.onyomi,
         en_translation=request.en_translation,
         ua_translation=request.ua_translation,
-        created_by=current_user.id
+        created_by=current_user.id,
+        approved=current_user.role.name == "linguist",
+        approved_by=current_user if current_user.role.name == "linguist" else None
     )
 
     print(dictionary.model_dump_json())
@@ -135,10 +138,36 @@ async def create_entry(request: DictionaryBase, current_user: User = Depends(get
 #     return db_dictionary.delete(db, dictionary_id)
 
 
-@router.get("/id/{id}", response_model=DictionaryBase)
-async def get_entry_by_id(id: PydanticObjectId):
+@router.get("/entry/{uuid}", response_model=DictionaryBase)
+async def get_entry_by_uuid(uuid: UUID):
     try:
-        dic = await Dictionary.get(id)
+        dic = await Dictionary.find_one(Dictionary.uuid == uuid)
+        return dic
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, detail=f"Error: {e}"
+        )
+
+
+@router.patch("/entry/{uuid}", response_model=DictionaryBase)
+async def approve_entry(uuid: UUID, current_user: User = Depends(get_current_user)):
+    try:
+        dic = await Dictionary.find_one(Dictionary.uuid == uuid)
+        dic.approved_by = current_user
+        dic.approved = True
+        await dic.save()
+        return dic
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, detail=f"Error: {e}"
+        )
+
+
+@router.delete("/entry/{uuid}", response_model=DictionaryBase)
+async def delete_entry_by_uuid(uuid: UUID):
+    try:
+        dic = await Dictionary.find_one(Dictionary.uuid == uuid)
+        await dic.delete()
         return dic
     except Exception as e:
         raise HTTPException(
@@ -160,7 +189,7 @@ async def get_entry_by_idseq(idseq: int):
 @router.get("/all", response_model=List[DictionaryBase])
 async def get_all_entries():
     try:
-        dic = await Dictionary.find_all().to_list()
+        dic = await Dictionary.find_all(fetch_links=True).to_list()
         return dic
     except Exception as e:
         raise HTTPException(
