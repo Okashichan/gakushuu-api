@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 from uuid import UUID
 from beanie import PydanticObjectId
@@ -143,6 +144,28 @@ async def create_entry(request: DictionaryCreate, current_user: User = Depends(g
 async def get_entry_by_uuid(uuid: UUID):
     try:
         dic = await Dictionary.find_one(Dictionary.uuid == uuid)
+        return dic
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, detail=f"Error: {e}"
+        )
+
+
+@router.post("/entry/{uuid}")
+async def update_entry_by_uuid(request: DictionaryCreate, uuid: UUID, current_user: User = Depends(get_current_user)):
+    try:
+        dic = await Dictionary.find_one(Dictionary.uuid == uuid)
+        dic.kanji = request.kanji
+        dic.hiragana = request.hiragana
+        dic.katakana = request.katakana
+        dic.romaji = request.romaji
+        dic.transliteration = request.transliteration
+        dic.kunyomi = request.kunyomi
+        dic.onyomi = request.onyomi
+        dic.en_translation = request.en_translation
+        dic.ua_translation = request.ua_translation
+        dic.updated_at = datetime.now()
+        await dic.save()
         return dic
     except Exception as e:
         raise HTTPException(
