@@ -230,9 +230,11 @@ async def search(query: str):
     dic_base_list = [DictionaryBase(**d.model_dump()) for d in dic]
     local = get_kanji_info(query)
 
-    results = DictionaryMassSearch(en_sourse=local, ua_sourse=dic_base_list)
+    filtered_local = [l for l in local if l['idseq']
+                      not in [d.idseq for d in dic_base_list]]
 
-    print(results.model_dump_json())
+    results = DictionaryMassSearch(
+        en_sourse=filtered_local, ua_sourse=dic_base_list)
 
     return results
 
