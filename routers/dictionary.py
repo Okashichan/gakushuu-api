@@ -22,7 +22,6 @@ router = APIRouter(
 
 
 def get_kanji_info(query: str | int):
-
     jam = Jamdict()
     kks = pykakasi.kakasi()
 
@@ -223,7 +222,6 @@ async def get_all_entries():
 
 @router.get("/search/{query}", response_model=DictionaryMassSearch)
 async def search(query: str):
-
     dic = await Dictionary.find_many(Or(
         RegEx(Dictionary.kanji, query, 'i'),
         RegEx(Dictionary.hiragana, query, 'i'),
@@ -232,7 +230,8 @@ async def search(query: str):
         RegEx(Dictionary.romaji, query, 'i')
     )).to_list()
 
-    dic_base_list = [DictionaryBase(**d.model_dump()) for d in dic]
+    dic_base_list = [DictionaryBase(**d.model_dump())
+                     for d in dic if d.approved]
     local = get_kanji_info(query)
 
     filtered_local = [l for l in local if l['idseq']
@@ -246,7 +245,6 @@ async def search(query: str):
 
 @ router.get("/jamdict/{idseq}")
 def get_jamdict(idseq: int):
-
     result = get_kanji_info(idseq)[0]
 
     return result
