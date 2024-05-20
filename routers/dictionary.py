@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
 from uuid import UUID
-from beanie import PydanticObjectId
+from beanie.operators import RegEx
 from beanie.odm.operators.find.logical import Or
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 import pykakasi
@@ -35,7 +35,7 @@ def get_kanji_info(query: str | int):
 
     for index, entry in enumerate(kanji_info.entries):
         hiragana = entry.kana_forms[0].text
-        print(entry)
+        # print(entry)
         results.append({
             "idseq": entry.idseq,
             "kanji": entry.kanji_forms[0].text if len(entry.kanji_forms) > 0 else None,
@@ -224,9 +224,14 @@ async def get_all_entries():
 @router.get("/search/{query}", response_model=DictionaryMassSearch)
 async def search(query: str):
 
-    dic = await Dictionary.find_many(Or(Dictionary.kanji == query,
-                                     Dictionary.hiragana == query,
-                                     Dictionary.ua_translation == query)).to_list()
+    dic = await Dictionary.find_many(Or(
+        RegEx(Dictionary.kanji, query, 'i'),
+        RegEx(Dictionary.hiragana, query, 'i'),
+        RegEx(Dictionary.katakana, query, 'i'),
+        RegEx(Dictionary.ua_translation, query, 'i'),
+        RegEx(Dictionary.romaji, query, 'i')
+    )).to_list()
+
     dic_base_list = [DictionaryBase(**d.model_dump()) for d in dic]
     local = get_kanji_info(query)
 
@@ -239,7 +244,7 @@ async def search(query: str):
     return results
 
 
-@router.get("/jamdict/{idseq}")
+@ router.get("/jamdict/{idseq}")
 def get_jamdict(idseq: int):
 
     result = get_kanji_info(idseq)[0]
