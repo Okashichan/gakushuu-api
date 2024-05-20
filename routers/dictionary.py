@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 import pykakasi
 from jamdict import Jamdict
 from auth.oauth2 import get_current_user
+import re
 
 from schemas.dictionary import (
     DictionaryBase, DictionaryMassSearch, DictionaryCreate)
@@ -35,12 +36,11 @@ def get_kanji_info(query: str | int):
 
     for index, entry in enumerate(kanji_info.entries):
         hiragana = entry.kana_forms[0].text
-        # print(entry)
         results.append({
             "idseq": entry.idseq,
             "kanji": entry.kanji_forms[0].text if len(entry.kanji_forms) > 0 else None,
             "hiragana": hiragana,
-            "katakana": entry.kana_forms[1].text if len(entry.kana_forms) > 1 else None,
+            "katakana": entry.kana_forms[-1].text if (len(entry.kana_forms) > 1 and bool(re.match(r'^[\u30A0-\u30FF]+$', entry.kana_forms[-1].text))) else None,
             "romaji": kks.convert(hiragana)[0]['hepburn'],
             "transliteration": hiragana_to_ukrainian(hiragana),
             "kunyomi": kanji_info.chars[0].rm_groups[0].kun_readings[0].value if len(kanji_info.chars) > 0 else None,
