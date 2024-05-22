@@ -7,11 +7,13 @@ from fastapi.staticfiles import StaticFiles
 
 from routers import (user,
                      role,
-                     dictionary)
+                     dictionary,
+                     collection)
 
 from models.role import Role
 from models.user import User
 from models.dictionary import Dictionary
+from models.collection import Collection
 
 from database.hash import Hash
 
@@ -29,7 +31,7 @@ async def lifespan(app: FastAPI):
         username=settings.MONGO_USER,
         password=settings.MONGO_PASSWORD,
     )
-    await init_beanie(database=app.client[settings.MONGO_DB], document_models=[User, Role, Dictionary])
+    await init_beanie(database=app.client[settings.MONGO_DB], document_models=[User, Role, Dictionary, Collection])
 
     role_admin = await Role.find_one({"name": "admin"})
     role_linguist = await Role.find_one({"name": "linguist"})
@@ -69,6 +71,7 @@ app.include_router(authentication.router)
 app.include_router(role.router)
 app.include_router(user.router)
 app.include_router(dictionary.router)
+app.include_router(collection.router)
 
 
 @app.get("/hello")

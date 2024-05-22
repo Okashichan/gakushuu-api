@@ -1,10 +1,11 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from beanie import PydanticObjectId
 from pydantic import BaseModel, EmailStr, Field
 from uuid import UUID
 from config import settings
 from schemas.role import RoleBase, RoleUpdate
+from schemas.collection import CollectionBase
 
 
 class UserBase(BaseModel):
@@ -48,5 +49,6 @@ class UserPrivate(BaseModel):
     role: RoleBase
     email: str
     username: str
+    collections: List[CollectionBase]
     avatar_url: str
     created_at: datetime
