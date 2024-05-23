@@ -10,3 +10,5 @@ requests
 pydantic-settings
 jamdict 
 pykakasi
+genanki
+python-slugify
