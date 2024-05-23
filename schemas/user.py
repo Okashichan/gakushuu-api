@@ -28,6 +28,7 @@ class UserPublic(BaseModel):
     avatar_url: str
     role: RoleUpdate
     created_at: datetime
+    collections: List[CollectionBase]
 
 
 class UserUpdate(BaseModel):

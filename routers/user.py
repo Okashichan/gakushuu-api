@@ -73,7 +73,13 @@ async def delete(current_user: UserModel = Depends(get_current_user)):
 
 @router.get("/{username}", response_model=UserPublicSchema)
 async def get_user(username: str):
-    return await UserModel.find_one({"username": username}, fetch_links=True)
+    user = await UserModel.find_one(UserModel.username == username, fetch_links=True)
+
+    user.collections = [c for c in user.collections if c.is_public]
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
 
 
 @router.post("/upload_avatar", response_model=UserPrivateSchema)

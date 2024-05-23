@@ -10,7 +10,7 @@ from schemas.dictionary import (
 from models.user import User
 from models.dictionary import Dictionary
 from models.collection import Collection
-from schemas.collection import CollectionBase, CollectionCreate
+from schemas.collection import CollectionBase, CollectionCreate, CollectionUpdate
 
 
 router = APIRouter(
@@ -50,8 +50,8 @@ async def get_collection_by_uuid(uuid: UUID):
     return collection
 
 
-@router.patch("/{uuid}", response_model=CollectionBase)
-async def update_collection_by_uuid(request: CollectionCreate, uuid: UUID, current_user: User = Depends(get_current_user)):
+@router.patch("/{uuid}", response_model=CollectionUpdate)
+async def update_collection_by_uuid(request: CollectionUpdate, uuid: UUID, current_user: User = Depends(get_current_user)):
     collection = await Collection.find_one(Collection.uuid == uuid, fetch_links=True, nesting_depth=1)
 
     if collection.id not in [c.id for c in current_user.collections]:
@@ -59,9 +59,9 @@ async def update_collection_by_uuid(request: CollectionCreate, uuid: UUID, curre
             status_code=400, detail="You don't have permission to edit this collection."
         )
 
-    collection.name = request.name
-    collection.description = request.description
-    collection.is_public = request.is_public
+    collection.name = request.name if request.name else collection.name
+    collection.description = request.description if request.description else collection.description
+    collection.is_public = request.is_public if request.is_public != collection.is_public else collection.is_public
 
     await collection.save()
 
@@ -101,6 +101,29 @@ async def add_entry_to_collection(uuid: UUID, word_uuid: UUID, current_user: Use
         )
 
     collection.words.append(dic)
+
+    await collection.save()
+
+    return collection
+
+
+@router.delete("/remove/{uuid}", response_model=CollectionBase)
+async def remove_entry_from_collection(uuid: UUID, word_uuid: UUID, current_user: User = Depends(get_current_user)):
+    collection = await Collection.find_one(Collection.uuid == uuid, fetch_links=True, nesting_depth=1)
+
+    if collection.id not in [c.id for c in current_user.collections]:
+        raise HTTPException(
+            status_code=400, detail="You don't have permission to edit this collection."
+        )
+
+    dic = await Dictionary.find_one(Dictionary.uuid == word_uuid)
+
+    if dic.id not in [d.id for d in collection.words]:
+        raise HTTPException(
+            status_code=400, detail="This word is not in the collection."
+        )
+
+    collection.words = [d for d in collection.words if d.id != dic.id]
 
     await collection.save()
 

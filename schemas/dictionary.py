@@ -38,6 +38,10 @@ class DictionaryCreate(BaseModel):
     ua_translation: Optional[str]
 
 
+class DictionaryCollection(DictionaryCreate):
+    uuid: UUID
+
+
 class DictionaryMassSearch(BaseModel):
     en_sourse: Optional[List[Any]]
     ua_sourse: Optional[List[DictionaryBase]]

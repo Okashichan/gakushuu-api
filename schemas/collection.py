@@ -5,7 +5,7 @@ from pydantic import BaseModel, EmailStr, Field
 from uuid import UUID
 
 from models.collection import Collection
-from schemas.dictionary import DictionaryCreate
+from schemas.dictionary import DictionaryCreate, DictionaryCollection
 
 
 class CollectionBase(BaseModel):
@@ -13,10 +13,16 @@ class CollectionBase(BaseModel):
     name: str
     description: Optional[str]
     is_public: bool
-    words: Optional[List[DictionaryCreate]]
+    words: Optional[List[DictionaryCollection]]
 
 
 class CollectionCreate(BaseModel):
     name: str
     description: Optional[str]
-    is_public: bool = False
+    is_public: bool
+
+
+class CollectionUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    is_public: Optional[bool] = None
