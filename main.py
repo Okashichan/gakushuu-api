@@ -8,7 +8,8 @@ from fastapi.staticfiles import StaticFiles
 from routers import (user,
                      role,
                      dictionary,
-                     collection)
+                     collection,
+                     quiz)
 
 from models.role import Role
 from models.user import User
@@ -72,6 +73,7 @@ app.include_router(role.router)
 app.include_router(user.router)
 app.include_router(dictionary.router)
 app.include_router(collection.router)
+app.include_router(quiz.router)
 
 
 @app.get("/hello")

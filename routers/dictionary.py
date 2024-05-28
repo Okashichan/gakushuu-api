@@ -3,7 +3,7 @@ from typing import List
 from uuid import UUID
 from beanie.operators import RegEx
 from beanie.odm.operators.find.logical import Or
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException
 import pykakasi
 from jamdict import Jamdict
 from auth.oauth2 import get_current_user
@@ -13,7 +13,7 @@ from schemas.dictionary import (
     DictionaryBase, DictionaryMassSearch, DictionaryCreate)
 from models.user import User
 from models.dictionary import Dictionary
-
+from dicts import hiragana_full
 
 router = APIRouter(
     prefix="/dictionary",
@@ -52,39 +52,7 @@ def get_kanji_info(query: str | int):
 
 
 def hiragana_to_ukrainian(hira):
-    htudict = {
-        # Basic
-        "あ": "а", "い": "і", "う": "у", "え": "е", "お": "о",
-        "か": "ка", "き": "кі", "く": "ку", "け": "ке", "こ": "ко",
-        "さ": "са", "し": "ші", "す": "су", "せ": "се", "そ": "со",
-        "た": "та", "ち": "чі", "つ": "цу", "て": "те", "と": "то",
-        "な": "на", "に": "ні", "ぬ": "ну", "ね": "не", "の": "но",
-        "は": "ха", "ひ": "хі", "ふ": "фу", "へ": "хе", "ほ": "хо",
-        "ま": "ма", "み": "мі", "む": "му", "め": "ме", "も": "мо",
-        "や": "я", "ゆ": "ю", "よ": "йо",
-        "ら": "ра", "り": "рі", "る": "ру", "れ": "ре", "ろ": "ро",
-        "わ": "ва", "を": "о", "ん": "н",
-        # Basic dakuten & handakuten
-        "が": "ґа", "ぎ": "ґі", "ぐ": "ґу", "げ": "ґе", "ご": "ґо",
-        "ざ": "дза", "じ": "джі", "ず": "дзу", "ぜ": "дзе", "ぞ": "дзо",
-        "だ": "да", "ぢ": "джі", "づ": "дзу", "で": "де", "ど": "до",
-        "ば": "ба", "び": "бі", "ぶ": "бу", "べ": "бе", "ぼ": "бо",
-        "ぱ": "па", "ぴ": "пі", "ぷ": "пу", "ぺ": "пе", "ぽ": "по",
-        # Combinations
-        "きゃ": "кя", "きゅ": "кю", "きょ": "кьо",
-        "しゃ": "шя", "しゅ": "шю", "しょ": "шьо",
-        "ちゃ": "чя", "ちゅ": "чю", "ちょ": "чьо",
-        "にゃ": "ня", "にゅ": "ню", "にょ": "ньо",
-        "ひゃ": "хя", "ひゅ": "хю", "ひょ": "хьо",
-        "みゃ": "мя", "みゅ": "мю", "みょ": "мьо",
-        "りゃ": "ря", "りゅ": "рю", "りょ": "рьо",
-        # Combinations with dakuten & handakuten
-        "ぎゃ": "ґя", "ぎゅ": "ґю", "ぎょ": "ґьо",
-        "じゃ": "джя", "じゅ": "джю", "じょ": "дьжо",
-        "ぢゃ": "джя", "ぢゅ": "джю", "ぢょ": "дьжо",
-        "びゃ": "бя", "びゅ": "бю", "びょ": "бьо",
-        "ぴゃ": "пя", "ぴゅ": "пю", "ぴょ": "пьо",
-    }
+    htudict = hiragana_full
     ukrainian_text = ""
     i = 0
     while i < len(hira):
