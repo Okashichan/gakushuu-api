@@ -1,3 +1,4 @@
+import re
 import deepl
 from jamdict import Jamdict
 import pykakasi
