@@ -14,8 +14,8 @@ class DictionaryBase(BaseModel):
     katakana: Optional[str]
     romaji: str
     transliteration: str
-    kunyomi: str
-    onyomi: str
+    kunyomi: Optional[str]
+    onyomi: Optional[str]
     en_translation: str
     ua_translation: Optional[str]
     approved: bool
@@ -31,8 +31,8 @@ class DictionaryCreate(BaseModel):
     katakana: Optional[str]
     romaji: str
     transliteration: str
-    kunyomi: str
-    onyomi: str
+    kunyomi: Optional[str]
+    onyomi: Optional[str]
     en_translation: str
     ua_translation: Optional[str]
 
