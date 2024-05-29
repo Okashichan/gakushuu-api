@@ -1,11 +1,12 @@
 from datetime import datetime
 from typing import Optional, List
-from beanie import PydanticObjectId
+from beanie import Link, PydanticObjectId
 from pydantic import BaseModel, EmailStr, Field
 from uuid import UUID
 from config import settings
 from schemas.role import RoleBase, RoleUpdate
 from schemas.collection import CollectionBase
+from schemas.stats import Stats
 
 
 class UserBase(BaseModel):
@@ -53,3 +54,10 @@ class UserPrivate(BaseModel):
     collections: List[CollectionBase]
     avatar_url: str
     created_at: datetime
+
+
+class UserStats(BaseModel):
+    """
+    Shared User properties for stats.
+    """
+    stats: Stats

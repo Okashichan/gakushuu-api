@@ -10,8 +10,10 @@ from models.role import Role
 from schemas.user import (UserBase as UserBaseSchema,
                           UserUpdate as UserUpdateSchema,
                           UserPrivate as UserPrivateSchema,
-                          UserPublic as UserPublicSchema)
+                          UserPublic as UserPublicSchema,
+                          UserStats as UserStatsSchema)
 from models.user import User as UserModel
+from models.stats import Stats
 from database.hash import Hash
 from beanie.exceptions import RevisionIdWasChanged
 
@@ -30,8 +32,8 @@ async def create(request: UserBaseSchema):
         username=request.username,
         password=Hash.bcrypt(request.password),
         email=request.email,
-        role=await Role.find_one(Role.name == "user")
-    )
+        role=await Role.find_one(Role.name == "user"),
+        stats=await Stats().create())
 
     try:
         await user.create()
@@ -44,6 +46,11 @@ async def create(request: UserBaseSchema):
 
 @router.get("/me", response_model=UserPrivateSchema)
 async def read_me(current_user: UserPrivateSchema = Depends(get_current_user)):
+    return current_user
+
+
+@router.get("/me/stats", response_model=UserStatsSchema)
+async def read_me_stats(current_user: UserPrivateSchema = Depends(get_current_user)):
     return current_user
 
 

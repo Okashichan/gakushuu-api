@@ -15,6 +15,7 @@ from models.role import Role
 from models.user import User
 from models.dictionary import Dictionary
 from models.collection import Collection
+from models.stats import Stats
 
 from database.hash import Hash
 
@@ -32,7 +33,7 @@ async def lifespan(app: FastAPI):
         username=settings.MONGO_USER,
         password=settings.MONGO_PASSWORD,
     )
-    await init_beanie(database=app.client[settings.MONGO_DB], document_models=[User, Role, Dictionary, Collection])
+    await init_beanie(database=app.client[settings.MONGO_DB], document_models=[User, Role, Dictionary, Collection, Stats])
 
     role_admin = await Role.find_one({"name": "admin"})
     role_linguist = await Role.find_one({"name": "linguist"})
@@ -55,6 +56,7 @@ async def lifespan(app: FastAPI):
             password=Hash.bcrypt(settings.ADMIN_PASSWORD),
             username="admin",
             role=role_admin,
+            stats=await Stats().create(),
             avatar_url=f"{settings.APP_URL}/static/images/blank_avatar.jpg"
         )
         await user.create()

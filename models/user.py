@@ -5,6 +5,7 @@ from beanie import Document, Indexed, Link
 from pydantic import EmailStr, Field
 from config import settings
 from models.role import Role
+from models.stats import Stats
 
 if TYPE_CHECKING:
     from models.collection import Collection
@@ -17,8 +18,7 @@ class User(Document):
     password: str = None
     role: Link[Role] = None
     collections: Optional[List[Link['Collection']]] = []
-    # hiragana_stats: Optional[dict] = hiragana_stats
-    # katakana_stats: Optional[dict] = katakana_stats
+    stats: Optional[Link[Stats]] = None
 
     avatar_url: Optional[str] = f'{settings.APP_URL}/static/images/blank_avatar.jpg'
     created_at: Optional[datetime] = Field(default_factory=datetime.now)

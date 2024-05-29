@@ -42,8 +42,15 @@ hiragana_kuten_combinations = {
 hiragana_full = {**hiragana_basic, **hiragana_combinations,
                  **hiragana_kuten, **hiragana_kuten_combinations}
 
-hiragana_stats = {k[0]: {"right": 0, "wrong": 0}
-                  for k in hiragana_full.items()}
+hiragana_basic_stats = {k[0]: {"right": 0, "wrong": 0}
+                        for k in hiragana_basic.items()}
+
+hiragana_kuten_stats = {k[0]: {"right": 0, "wrong": 0}
+                        for k in hiragana_kuten.items()}
+
+hiragana_kuten_combinations_stats = {k[0]: {"right": 0, "wrong": 0}
+                                     for k in {**hiragana_combinations, **hiragana_kuten_combinations}.items()}
+
 
 # Katakana
 katakana_basic = {
@@ -90,3 +97,12 @@ katakana_full = {**katakana_basic, **katakana_combinations,
 
 katakana_stats = {k[0]: {"right": 0, "wrong": 0}
                   for k in katakana_full.items()}
+
+katakana_basic_stats = {k[0]: {"right": 0, "wrong": 0}
+                        for k in katakana_basic.items()}
+
+katakana_kuten_stats = {k[0]: {"right": 0, "wrong": 0}
+                        for k in katakana_kuten.items()}
+
+katakana_kuten_combinations_stats = {k[0]: {"right": 0, "wrong": 0}
+                                     for k in {**katakana_combinations, **katakana_kuten_combinations}.items()}
