@@ -1,7 +1,18 @@
 import random
 from typing import List
 from fastapi import APIRouter, Depends
-from helpers.dicts import *
+from helpers.dicts import (
+    hiragana_basic,
+    hiragana_combinations,
+    hiragana_kuten,
+    hiragana_kuten_combinations,
+    hiragana_full,
+    katakana_basic,
+    katakana_combinations,
+    katakana_kuten,
+    katakana_kuten_combinations,
+    katakana_full,
+)
 from models.stats import Stats
 from auth.oauth2 import get_current_user
 from schemas.user import UserStats
