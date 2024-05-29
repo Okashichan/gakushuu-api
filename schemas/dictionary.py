@@ -9,7 +9,7 @@ from models.user import User
 class DictionaryBase(BaseModel):
     uuid: UUID
     idseq: Optional[int]
-    kanji: str
+    kanji: Optional[str]
     hiragana: str
     katakana: Optional[str]
     romaji: str
@@ -26,7 +26,7 @@ class DictionaryBase(BaseModel):
 
 class DictionaryCreate(BaseModel):
     idseq: Optional[int]
-    kanji: str
+    kanji: Optional[str]
     hiragana: str
     katakana: Optional[str]
     romaji: str
