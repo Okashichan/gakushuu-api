@@ -1,11 +1,9 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends
 from auth.oauth2 import get_current_user, admin_check
-
 from models.role import Role
 from schemas.role import RoleUpdate
 from schemas.user import UserPrivate
-
 from models.user import User
 
 

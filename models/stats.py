@@ -1,5 +1,5 @@
 from beanie import Document
-from dicts import (
+from helpers.dicts import (
     hiragana_basic_stats,
     hiragana_kuten_stats,
     hiragana_kuten_combinations_stats,

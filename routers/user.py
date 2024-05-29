@@ -14,7 +14,7 @@ from schemas.user import (UserBase as UserBaseSchema,
                           UserStats as UserStatsSchema)
 from models.user import User as UserModel
 from models.stats import Stats
-from database.hash import Hash
+from helpers.hash import Hash
 from beanie.exceptions import RevisionIdWasChanged
 
 router = APIRouter(

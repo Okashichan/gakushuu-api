@@ -3,8 +3,7 @@ from datetime import datetime
 from uuid import UUID, uuid4
 
 from beanie import Document, Indexed, Link
-from pydantic import EmailStr, Field
-from config import settings
+from pydantic import Field
 from models.user import User
 
 

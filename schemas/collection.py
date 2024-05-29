@@ -1,11 +1,8 @@
-from datetime import datetime
-from typing import Any, List, Optional
-from beanie import Link, PydanticObjectId
-from pydantic import BaseModel, EmailStr, Field
-from uuid import UUID
 
-from models.collection import Collection
-from schemas.dictionary import DictionaryCreate, DictionaryCollection
+from typing import List, Optional
+from pydantic import BaseModel
+from uuid import UUID
+from schemas.dictionary import DictionaryCollection
 
 
 class CollectionBase(BaseModel):

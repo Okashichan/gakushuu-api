@@ -1,5 +1,4 @@
 from uuid import UUID, uuid4
-
 from beanie import Document
 from pydantic import Field
 

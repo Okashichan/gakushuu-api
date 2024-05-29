@@ -3,7 +3,6 @@ from typing import Any, List, Optional
 from beanie import Link, PydanticObjectId
 from pydantic import BaseModel, EmailStr, Field
 from uuid import UUID
-
 from models.user import User
 
 

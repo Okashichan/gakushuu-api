@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional, List
-from beanie import Link, PydanticObjectId
+from beanie import PydanticObjectId
 from pydantic import BaseModel, EmailStr, Field
 from uuid import UUID
 from config import settings

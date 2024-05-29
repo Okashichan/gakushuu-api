@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
-from database.hash import Hash
+from helpers.hash import Hash
 from auth import oauth2
 
 from models.user import User

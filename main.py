@@ -17,8 +17,7 @@ from models.dictionary import Dictionary
 from models.collection import Collection
 from models.stats import Stats
 
-from database.hash import Hash
-
+from helpers.hash import Hash
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 from config import settings
@@ -26,7 +25,6 @@ from config import settings
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Setup mongoDB
     app.client = AsyncIOMotorClient(
         settings.MONGO_HOST,
         settings.MONGO_PORT,
@@ -64,11 +62,6 @@ async def lifespan(app: FastAPI):
     yield
 
 
-# from database import models
-# from database.database import engine
-# from routers import role, user, dictionary
-
-
 app = FastAPI(lifespan=lifespan)
 app.include_router(authentication.router)
 app.include_router(role.router)
@@ -76,14 +69,6 @@ app.include_router(user.router)
 app.include_router(dictionary.router)
 app.include_router(collection.router)
 app.include_router(quiz.router)
-
-
-@app.get("/hello")
-def index():
-    return {"message": "Hello, World!"}
-
-
-# models.Base.metadata.create_all(engine)
 
 
 origins = [

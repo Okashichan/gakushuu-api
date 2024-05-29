@@ -4,91 +4,17 @@ from uuid import UUID
 from beanie.operators import RegEx
 from beanie.odm.operators.find.logical import Or
 from fastapi import APIRouter, Depends, HTTPException
-import pykakasi
-from jamdict import Jamdict
 from auth.oauth2 import get_current_user
-import re
-import deepl
-
 from schemas.dictionary import (
     DictionaryBase, DictionaryMassSearch, DictionaryCreate)
 from models.user import User
 from models.dictionary import Dictionary
-from dicts import hiragana_full
-from config import settings
+from helpers.dicts import get_kanji_info
 
 router = APIRouter(
     prefix="/dictionary",
     tags=["Dictionary"]
 )
-
-
-def hiragana_to_katakana(text):
-    katakana_text = []
-
-    for char in text:
-        code_point = ord(char)
-
-        if 0x3041 <= code_point <= 0x3096:
-            katakana_char = chr(code_point + 0x60)
-            katakana_text.append(katakana_char)
-        else:
-            katakana_text.append(char)
-
-    return ''.join(katakana_text)
-
-
-def get_kanji_info(query: str | int, deeplapi: bool = False):
-    jam = Jamdict()
-    kks = pykakasi.kakasi()
-
-    results = []
-
-    kanji_info = jam.lookup(query) if isinstance(
-        query, str) else jam.lookup(f'id#{query}')
-
-    if not kanji_info:
-        return "Kanji not found in the dictionary."
-
-    for index, entry in enumerate(kanji_info.entries):
-        hiragana = entry.kana_forms[0].text
-        results.append({
-            "idseq": entry.idseq,
-            "kanji": entry.kanji_forms[0].text if len(entry.kanji_forms) > 0 else None,
-            "hiragana": hiragana,
-            "katakana": entry.kana_forms[-1].text if (len(entry.kana_forms) > 1 and bool(re.match(r'^[\u30A0-\u30FF]+$', entry.kana_forms[-1].text))) else None,
-            "romaji": kks.convert(hiragana)[0]['hepburn'],
-            "transliteration": hiragana_to_ukrainian(hiragana),
-            "kunyomi": kanji_info.chars[0].rm_groups[0].kun_readings[0].value if len(kanji_info.chars) > 0 else None,
-            "onyomi": kanji_info.chars[0].rm_groups[0].on_readings[0].value if len(kanji_info.chars) > 0 else None,
-            "en_translation": entry.senses[0].gloss[0].text,
-            "ua_translation": None,
-        })
-
-    if deeplapi:
-        translator = deepl.Translator(settings.DEEPL_API_KEY)
-        results[0]["ua_translation"] = translator.translate_text(
-            results[0]["en_translation"], source_lang='EN', target_lang='UK').text
-
-        if results[0]['katakana'] is None:
-            results[0]['katakana'] = hiragana_to_katakana(
-                results[0]['hiragana'])
-
-    return results
-
-
-def hiragana_to_ukrainian(hira):
-    htudict = hiragana_full
-    ukrainian_text = ""
-    i = 0
-    while i < len(hira):
-        if i + 1 < len(hira) and hira[i:i+2] in htudict:
-            ukrainian_text += htudict[hira[i:i+2]]
-            i += 2
-        else:
-            ukrainian_text += htudict.get(hira[i], hira[i])
-            i += 1
-    return ukrainian_text
 
 
 @router.post("/")
