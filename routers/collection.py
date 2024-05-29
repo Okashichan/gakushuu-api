@@ -68,6 +68,7 @@ def generate_anki_deck(collection):
 
 @ router.post("/", response_model=CollectionBase, status_code=status.HTTP_201_CREATED)
 async def create(request: CollectionCreate, current_user: User = Depends(get_current_user)):
+    print(request.model_dump_json())
     collection = Collection(
         name=request.name,
         description=request.description,

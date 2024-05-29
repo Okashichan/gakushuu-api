@@ -8,12 +8,14 @@ import pykakasi
 from jamdict import Jamdict
 from auth.oauth2 import get_current_user
 import re
+import deepl
 
 from schemas.dictionary import (
     DictionaryBase, DictionaryMassSearch, DictionaryCreate)
 from models.user import User
 from models.dictionary import Dictionary
 from dicts import hiragana_full
+from config import settings
 
 router = APIRouter(
     prefix="/dictionary",
@@ -21,7 +23,22 @@ router = APIRouter(
 )
 
 
-def get_kanji_info(query: str | int):
+def hiragana_to_katakana(text):
+    katakana_text = []
+
+    for char in text:
+        code_point = ord(char)
+
+        if 0x3041 <= code_point <= 0x3096:
+            katakana_char = chr(code_point + 0x60)
+            katakana_text.append(katakana_char)
+        else:
+            katakana_text.append(char)
+
+    return ''.join(katakana_text)
+
+
+def get_kanji_info(query: str | int, deeplapi: bool = False):
     jam = Jamdict()
     kks = pykakasi.kakasi()
 
@@ -48,6 +65,15 @@ def get_kanji_info(query: str | int):
             "ua_translation": None,
         })
 
+    if deeplapi:
+        translator = deepl.Translator(settings.DEEPL_API_KEY)
+        results[0]["ua_translation"] = translator.translate_text(
+            results[0]["en_translation"], source_lang='EN', target_lang='UK').text
+
+        if results[0]['katakana'] is None:
+            results[0]['katakana'] = hiragana_to_katakana(
+                results[0]['hiragana'])
+
     return results
 
 
@@ -67,9 +93,6 @@ def hiragana_to_ukrainian(hira):
 
 @router.post("/")
 async def create_entry(request: DictionaryCreate, current_user: User = Depends(get_current_user)):
-
-    print(request.model_dump_json())
-
     dictionary = Dictionary(
         idseq=request.idseq,
         kanji=request.kanji,
@@ -85,8 +108,6 @@ async def create_entry(request: DictionaryCreate, current_user: User = Depends(g
         approved=current_user.role.name == "linguist",
         approved_by=current_user if current_user.role.name == "linguist" else None
     )
-
-    print(dictionary.model_dump_json())
 
     try:
         await dictionary.save()
@@ -204,6 +225,6 @@ async def search(query: str):
 
 @ router.get("/jamdict/{idseq}")
 def get_jamdict(idseq: int):
-    result = get_kanji_info(idseq)[0]
+    result = get_kanji_info(idseq, deeplapi=True)[0]
 
     return result

@@ -12,3 +12,4 @@ jamdict
 pykakasi
 genanki
 python-slugify
+deepl

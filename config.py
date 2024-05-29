@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     ADMIN_EMAIL: str
     ADMIN_PASSWORD: str
 
+    # DEEPL
+
+    DEEPL_API_KEY: str
+
     model_config = SettingsConfigDict(env_file=".env")
 
 
