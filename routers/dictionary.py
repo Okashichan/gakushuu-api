@@ -97,16 +97,6 @@ async def create_entry(request: DictionaryCreate, current_user: User = Depends(g
         )
 
 
-# @router.put("/{dictionary_id}")
-# def update(dictionary_id: int, request: DictionaryUpdate, db: Session = Depends(get_db), current_user: UserBase = Depends(get_current_user)):
-#     return db_dictionary.update(db, request, dictionary_id)
-
-
-# @router.delete("/{dictionary_id}")
-# def delete(dictionary_id: int, db: Session = Depends(get_db), current_user: UserBase = Depends(get_current_user)):
-#     return db_dictionary.delete(db, dictionary_id)
-
-
 @router.get("/entry/{uuid}", response_model=DictionaryBase)
 async def get_entry_by_uuid(uuid: UUID):
     try:
@@ -180,7 +170,8 @@ async def get_entry_by_idseq(idseq: int):
 @router.get("/all", response_model=List[DictionaryBase])
 async def get_all_entries():
     try:
-        dic = await Dictionary.find_all(fetch_links=True).to_list()
+        dic = await Dictionary.find_all(fetch_links=True, nesting_depths_per_field={"collections": 0,
+                                                                                    "approved_by": 1}).to_list()
         return dic
     except Exception as e:
         raise HTTPException(

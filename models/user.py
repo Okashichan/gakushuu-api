@@ -17,6 +17,8 @@ class User(Document):
     password: str = None
     role: Link[Role] = None
     collections: Optional[List[Link['Collection']]] = []
+    # hiragana_stats: Optional[dict] = hiragana_stats
+    # katakana_stats: Optional[dict] = katakana_stats
 
     avatar_url: Optional[str] = f'{settings.APP_URL}/static/images/blank_avatar.jpg'
     created_at: Optional[datetime] = Field(default_factory=datetime.now)

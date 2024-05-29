@@ -42,6 +42,9 @@ hiragana_kuten_combinations = {
 hiragana_full = {**hiragana_basic, **hiragana_combinations,
                  **hiragana_kuten, **hiragana_kuten_combinations}
 
+hiragana_stats = {k[0]: {"right": 0, "wrong": 0}
+                  for k in hiragana_full.items()}
+
 # Katakana
 katakana_basic = {
     "ア": "а", "イ": "і", "ウ": "у", "エ": "е", "オ": "о",
@@ -84,3 +87,6 @@ katakana_kuten_combinations = {
 
 katakana_full = {**katakana_basic, **katakana_combinations,
                  **katakana_kuten, **katakana_kuten_combinations}
+
+katakana_stats = {k[0]: {"right": 0, "wrong": 0}
+                  for k in katakana_full.items()}
