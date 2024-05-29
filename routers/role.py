@@ -13,11 +13,11 @@ router = APIRouter(
 )
 
 
-@router.patch("/{uuid}", response_model=UserPrivate)
-async def update(uuid: UUID, request: RoleUpdate, current_user: UserPrivate = Depends(get_current_user), is_admin: bool = Depends(admin_check)):
-    update_data = await User.find_one(User.uuid == uuid, fetch_links=True)
+@router.patch("/{email}", response_model=UserPrivate)
+async def update(email: str, current_user: UserPrivate = Depends(get_current_user), is_admin: bool = Depends(admin_check)):
+    update_data = await User.find_one(User.email == email, fetch_links=True)
 
-    update_data.role = await Role.find_one(Role.name == request.name)
+    update_data.role = await Role.find_one(Role.name == 'linguist')
 
     await update_data.save()
 

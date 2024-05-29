@@ -133,7 +133,8 @@ async def search(query: str):
         RegEx(Dictionary.hiragana, query, 'i'),
         RegEx(Dictionary.katakana, query, 'i'),
         RegEx(Dictionary.ua_translation, query, 'i'),
-        RegEx(Dictionary.romaji, query, 'i')
+        RegEx(Dictionary.romaji, query, 'i'),
+        RegEx(Dictionary.transliteration, query, 'i'),
     )).to_list()
 
     dic_base_list = [DictionaryBase(**d.model_dump())
