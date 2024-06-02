@@ -150,7 +150,7 @@ async def search(query: str):
     return results
 
 
-@ router.get("/jamdict/{idseq}")
+@router.get("/jamdict/{idseq}")
 def get_jamdict(idseq: int):
     result = get_kanji_info(idseq, deeplapi=True)[0]
 
