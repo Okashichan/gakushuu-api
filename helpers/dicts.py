@@ -59,17 +59,25 @@ def get_kanji_info(query: str | int, deeplapi: bool = False):
     return results
 
 
-def hiragana_to_ukrainian(hira):
+def hiragana_to_ukrainian(query, info=False):
+    kks = pykakasi.kakasi()
+    force_hira = ''.join([f['hira'] for f in kks.convert(query)])
     htudict = hiragana_full
     ukrainian_text = ""
     i = 0
-    while i < len(hira):
-        if i + 1 < len(hira) and hira[i:i+2] in htudict:
-            ukrainian_text += htudict[hira[i:i+2]]
+    while i < len(force_hira):
+        if i + 1 < len(force_hira) and force_hira[i:i+2] in htudict:
+            ukrainian_text += htudict[force_hira[i:i+2]]
             i += 2
         else:
-            ukrainian_text += htudict.get(hira[i], hira[i])
+            ukrainian_text += htudict.get(force_hira[i], force_hira[i])
             i += 1
+    if info:
+        return {
+            "ukrainian": ukrainian_text,
+            "hiragana": force_hira,
+            "romaji": ''.join([f['hepburn'] for f in kks.convert(query)]),
+        }
     return ukrainian_text
 
 

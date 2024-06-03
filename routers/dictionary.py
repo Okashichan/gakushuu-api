@@ -4,17 +4,22 @@ from uuid import UUID
 from beanie.operators import RegEx
 from beanie.odm.operators.find.logical import Or
 from fastapi import APIRouter, Depends, HTTPException
-from auth.oauth2 import get_current_user
+from auth.oauth2 import get_current_user, linguist_check
 from schemas.dictionary import (
     DictionaryBase, DictionaryMassSearch, DictionaryCreate)
 from models.user import User
 from models.dictionary import Dictionary
-from helpers.dicts import get_kanji_info
+from helpers.dicts import get_kanji_info, hiragana_to_ukrainian
 
 router = APIRouter(
     prefix="/dictionary",
     tags=["Dictionary"]
 )
+
+
+@router.post("/trasliteration")
+async def transliteration(query: str):
+    return hiragana_to_ukrainian(query, info=True)
 
 
 @router.post("/")
@@ -78,7 +83,7 @@ async def update_entry_by_uuid(request: DictionaryCreate, uuid: UUID, current_us
 
 
 @router.patch("/entry/{uuid}", response_model=DictionaryBase)
-async def approve_entry(uuid: UUID, current_user: User = Depends(get_current_user)):
+async def approve_entry(uuid: UUID, current_user: User = Depends(get_current_user), linguist_check=Depends(linguist_check)):
     try:
         dic = await Dictionary.find_one(Dictionary.uuid == uuid)
         dic.approved_by = current_user
@@ -117,8 +122,8 @@ async def get_entry_by_idseq(idseq: int):
 @router.get("/all", response_model=List[DictionaryBase])
 async def get_all_entries():
     try:
-        dic = await Dictionary.find_all(fetch_links=True, nesting_depths_per_field={"collections": 0,
-                                                                                    "approved_by": 1}).to_list()
+        dic = await Dictionary.find_all(fetch_links=True, nesting_depths_per_field={"approved_by": 2}).to_list()
+
         return dic
     except Exception as e:
         raise HTTPException(

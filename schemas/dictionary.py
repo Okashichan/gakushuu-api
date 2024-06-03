@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import Any, List, Optional
-from beanie import Link
 from pydantic import BaseModel
 from uuid import UUID
-from models.user import User
+
+from schemas.user_dict import UserOut
 
 
 class DictionaryBase(BaseModel):
@@ -20,8 +20,8 @@ class DictionaryBase(BaseModel):
     ua_translation: Optional[str]
     approved: bool
     updated_at: datetime
-    approved_by: Optional[Link[User]]
-    created_by: Link[User]
+    approved_by: Optional["UserOut"]
+    created_by: Optional["UserOut"]
 
 
 class DictionaryCreate(BaseModel):
