@@ -33,7 +33,8 @@ def generate_anki_deck(collection):
             model=model,
             fields=[
                 word.get('kanji') if word.get('kanji') else '',
-                word.get('hiragana'),
+                word.get('hiragana') if word.get('hiragana') else '',
+                word.get('katakana') if word.get('katakana') else '',
                 word.get('transliteration'),
                 word.get('ua_translation')
             ]
