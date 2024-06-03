@@ -71,16 +71,16 @@ app.include_router(collection.router)
 app.include_router(quiz.router)
 
 
-origins = [
-    "*"
-]
+# origins = [
+#     "*"
+# ]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=origins,
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
