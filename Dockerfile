@@ -12,4 +12,7 @@ COPY . .
 
 FROM base as final
 
+RUN mkdir -p /app/static/files
+RUN mkdir -p /app/static/images
+
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
