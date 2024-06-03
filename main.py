@@ -70,18 +70,12 @@ app.include_router(dictionary.router)
 app.include_router(collection.router)
 app.include_router(quiz.router)
 
-
-origins = [
-    "https://gakushuu.pp.ua",
-    "https://api.gakushuu.pp.ua"
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
