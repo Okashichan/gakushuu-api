@@ -32,9 +32,8 @@ def generate_anki_deck(collection):
         note = genanki.Note(
             model=model,
             fields=[
-                word.get('kanji'),
+                word.get('kanji') if word.get('kanji') else '',
                 word.get('hiragana'),
-                word.get('katakana') if word.get('katakana') else '',
                 word.get('transliteration'),
                 word.get('ua_translation')
             ]
