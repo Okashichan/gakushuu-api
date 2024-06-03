@@ -3,10 +3,10 @@ import uuid
 from config import settings
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from auth.oauth2 import get_current_user
-
-
 from pymongo import errors
+from models.collection import Collection
 from models.role import Role
+from models.dictionary import Dictionary
 from schemas.user import (UserBase as UserBaseSchema,
                           UserUpdate as UserUpdateSchema,
                           UserPrivate as UserPrivateSchema,
@@ -16,6 +16,7 @@ from models.user import User as UserModel
 from models.stats import Stats
 from helpers.hash import Hash
 from beanie.exceptions import RevisionIdWasChanged
+from beanie.odm.operators.find.logical import Or
 
 router = APIRouter(
     prefix="/user",
@@ -72,7 +73,25 @@ async def update(update: UserUpdateSchema, current_user: UserModel = Depends(get
 
 @router.delete("/me", response_model=UserPrivateSchema)
 async def delete(current_user: UserModel = Depends(get_current_user)):
-    await current_user.delete()
+    user = await UserModel.find_one(UserModel.id == current_user.id)
+
+    if user.collections:
+        for collection_link in user.collections:
+            collection = await Collection.get(collection_link.id)
+            if collection:
+                await collection.delete()
+
+    dictionaries_created_by_user = await Dictionary.find(Dictionary.created_by.id == user.id).to_list()
+    for dictionary in dictionaries_created_by_user:
+        await dictionary.delete()
+
+    dictionaries_approved_by_user = await Dictionary.find(Dictionary.approved_by.id == user.id).to_list()
+    for dictionary in dictionaries_approved_by_user:
+        dictionary.approved_by = None
+        await dictionary.save()
+
+    await user.delete()
+
     return current_user
 
 
