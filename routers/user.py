@@ -26,8 +26,6 @@ router = APIRouter(
 @router.post("/", response_model=UserBaseSchema, status_code=status.HTTP_201_CREATED)
 async def create(request: UserBaseSchema):
 
-    print(request.model_dump_json())
-
     user = UserModel(
         username=request.username,
         password=Hash.bcrypt(request.password),

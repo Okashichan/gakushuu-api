@@ -2,11 +2,30 @@ from datetime import datetime
 from typing import Any, List, Optional
 from pydantic import BaseModel
 from uuid import UUID
-
+from beanie import Link
 from schemas.user_dict import UserOut
+from models.user import User
 
 
 class DictionaryBase(BaseModel):
+    uuid: UUID
+    idseq: Optional[int]
+    kanji: Optional[str]
+    hiragana: str
+    katakana: Optional[str]
+    romaji: str
+    transliteration: str
+    kunyomi: Optional[str]
+    onyomi: Optional[str]
+    en_translation: str
+    ua_translation: Optional[str]
+    approved: bool
+    updated_at: datetime
+    approved_by: Optional[Link[User]]
+    created_by: Link[User]
+
+
+class DictionaryOptimized(BaseModel):
     uuid: UUID
     idseq: Optional[int]
     kanji: Optional[str]
