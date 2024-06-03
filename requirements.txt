@@ -1,6 +1,7 @@
 fastapi
 uvicorn
 sqlalchemy
+beanie
 bcrypt==4.0.1
 passlib[bcrypt]
 python-multipart
